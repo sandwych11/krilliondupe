@@ -58,6 +58,8 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
 .airbar{height:100%;background:var(--cyan);width:100%}
 .air.low .airbar{background:var(--red)}
 .timer{font-family:'Press Start 2P';font-size:42px;text-align:right;margin:16px 0 10px}
+.timer.ready{color:var(--cyan)}
+.msg.ready{color:var(--cyan);letter-spacing:.2em;text-transform:uppercase}
 .timer.low{color:var(--red);animation:blink .5s steps(2) infinite}
 @keyframes blink{50%{opacity:.4}}
 .prompt{font-size:clamp(30px,5.5vw,42px);line-height:1.15;margin:6px 0 26px;color:#fff;text-transform:uppercase;letter-spacing:.04em}
@@ -175,10 +177,11 @@ form{display:flex;gap:10px}
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // >>> CHANGE THIS NUMBER TO SWITCH TODAY'S DIVE (1, 2, 3...)
-const ACTIVE_DAY = 1;
+const ACTIVE_DAY = 2;
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 const ROUND_SECONDS = 25;   // seconds per prompt
+const READ_SECONDS  = 3;    // reading time before the timer starts (typing is locked)
 
 // To add a new day: copy a whole { number: X, questions: [...] } block,
 // paste it at the end of this list, and give it the next number.
@@ -326,15 +329,15 @@ const DAYS = [
     {
       prompt: "Name anyone on Keegan's **** List",
       answers: {
-        plankton: ["James Charles", "Pokimane"],
-        schooler: ["Loona", "Velma", "Lola", "Daphne"],
+        plankton: ["Pokimane"],
+        schooler: ["James Charles", "Loona", "Velma", "Lola", "Daphne"],
         rare: ["Amy", "Blaze", "Lara Croft"],
-        deep: ["Tom and Jerry Cat Lady Thing", "Sam", "COC Villager Lady", "Lady Dimitrescu", "Snapchat They/Them", "Ankha", "IQ"],
+        deep: ["Sam", "COC Villager Lady", "Lady Dimitrescu", "Snapchat They/Them", "Ankha", "IQ"],
         krillion: ["Toodles Galore", "Whisper the Wolf"]
       },
       similars: {
         "James": "James Charles", "Poki": "Pokimane", "Luna": "Loona", "Lola Bunny": "Lola", "Amy Rose": "Amy",
-        "Blaze the Cat": "Blaze", "Lara": "Lara Croft", "Cat Lady": "Tom and Jerry Cat Lady Thing", "Mammy Two Shoes": "Tom and Jerry Cat Lady Thing",
+        "Blaze the Cat": "Blaze", "Lara": "Lara Croft",
         "Villager": "COC Villager Lady", "Villager Lady": "COC Villager Lady", "COC Villager": "COC Villager Lady", "Clash of Clans Villager": "COC Villager Lady",
         "Clash of Clans Villager Lady": "COC Villager Lady", "Lady D": "Lady Dimitrescu", "Dimitrescu": "Lady Dimitrescu",
         "They Them": "Snapchat They/Them", "They/Them": "Snapchat They/Them", "Anka": "Ankha",
@@ -373,7 +376,7 @@ const DAYS = [
     answers: {
       plankton: ["Super Smash Bros","Mario Party"],
       schooler: ["FIFA","Mario Strikers","Mario Kart","Jackbox","Gartic"],
-      rare:     ["Pico Park","Mario Party Superstars"],
+      rare:     ["Pico Park","Mario Party Superstars","Just Dance"],
       deep:     ["Mario Party 10","Super Mario Party"],
       krillion: ["Nintendo Land"]
     },
@@ -545,10 +548,28 @@ function startRound(i){
   $("msg").textContent = ""; $("msg").className = "msg";
   $("reveal").classList.add("hidden");
   $("form").classList.remove("hidden");
-  const g = $("guess"); g.value = ""; g.disabled = false; g.focus();
+  const g = $("guess"); g.value = ""; g.disabled = true; g.placeholder = "Read the prompt...";
   $("timer").classList.remove("low"); $("air").classList.remove("low");
-  state.deadline = performance.now() + ROUND_SECONDS*1000;
+  $("airbar").style.width = "100%";
   cancelAnimationFrame(state.raf);
+  state.readEnd = performance.now() + READ_SECONDS*1000;
+  readTick();
+}
+
+// 3-second reading countdown before the real timer starts
+function readTick(){
+  const left = (state.readEnd - performance.now())/1000;
+  if(left <= 0){ beginTimer(); return; }
+  $("timer").textContent = Math.ceil(left);
+  $("timer").classList.add("ready");
+  setMsg("Get ready...", "ready");
+  state.raf = requestAnimationFrame(readTick);
+}
+function beginTimer(){
+  $("timer").classList.remove("ready");
+  setMsg("", "");
+  const g = $("guess"); g.disabled = false; g.placeholder = "Type an answer"; g.focus();
+  state.deadline = performance.now() + ROUND_SECONDS*1000;
   tick();
 }
 
