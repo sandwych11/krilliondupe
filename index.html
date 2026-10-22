@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KonraXD Krillion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#2b323e; --sky2:#252c38; --deep:#0c1424; --deep2:#080e1a;
+  --ink:#e9eef5; --dim:#8a96a8; --faint:#56627a; --line:#3a4558;
+  --cyan:#6fd3ea; --pink:#ec5f84; --purple:#8f7cf0; --red:#e5484d; --gold:#f2c94c; --plank:#b9c6d6;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 40%,#162033 70%,var(--deep2) 100%);
+  background-attachment:fixed;
+  color:var(--ink); font-family:'VT323',monospace; font-size:22px; min-height:100vh; overflow-x:hidden;
+}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px)}
+.bgword{position:fixed;top:16vh;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;
+  font-family:'Press Start 2P';font-size:min(13vw,140px);white-space:nowrap;letter-spacing:.04em;line-height:1.2;text-align:center}
+.bgword span{display:block;color:transparent;-webkit-text-stroke:3px rgba(236,95,132,.22)}
+.bgword span+span{position:absolute;left:7px;top:5px;-webkit-text-stroke:3px rgba(111,211,234,.1)}
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:28px 16px 80px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}
+.logo{font-family:'Press Start 2P';font-size:22px;color:#fff;text-shadow:-3px 0 var(--pink),3px 0 var(--cyan)}
+.label{font-size:19px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.hidden{display:none!important}
+.title{font-family:'Press Start 2P';font-size:clamp(20px,5vw,32px);color:var(--cyan);letter-spacing:.14em;margin:48px 0 16px;line-height:1.5}
+.desc{color:var(--ink);font-size:26px;line-height:1.25;margin:0 0 14px;max-width:640px}
+.tag{color:var(--dim);font-size:25px;margin:0 0 40px}
+.txt{width:100%;background:rgba(8,14,26,.75);border:2px solid var(--line);color:var(--ink);font:inherit;font-size:30px;padding:12px 16px;outline:none;border-radius:0;min-width:0}
+.txt:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(111,211,234,.15)}
+.txt:disabled{opacity:.5}
+.btn{font-family:'VT323',monospace;font-size:28px;letter-spacing:.3em;text-transform:uppercase;padding:12px 22px;border:3px solid #05080f;background:var(--deep);color:var(--ink);cursor:pointer;box-shadow:0 5px 0 #05080f;border-radius:0}
+.btn.primary{background:var(--pink);color:#0b0f17;box-shadow:0 5px 0 #8a2c47}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #05080f}
+.btn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.btn.wide{width:100%;padding:22px}
+.field{margin-bottom:26px}
+.field .label{display:block;margin-bottom:10px}
+.legend{margin-top:44px}
+.archive{margin-top:44px}
+.archive .daybtns{margin-top:16px}
+.daybtns{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.legend-row{display:grid;grid-template-columns:52px 1fr auto;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.ico{display:flex;align-items:center;justify-content:center}
+.spr{display:block}
+
+/* game */
+.hud{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;gap:10px}
+.hud b{color:var(--cyan);font-weight:normal}
+.air{height:12px;border:2px solid var(--line);background:rgba(8,14,26,.6)}
+.airbar{height:100%;background:var(--cyan);width:100%}
+.air.low .airbar{background:var(--red)}
+.timer{font-family:'Press Start 2P';font-size:42px;text-align:right;margin:16px 0 10px}
+.timer.low{color:var(--red);animation:blink .5s steps(2) infinite}
+@keyframes blink{50%{opacity:.4}}
+.prompt{font-size:clamp(30px,5.5vw,42px);line-height:1.15;margin:6px 0 26px;color:#fff;text-transform:uppercase;letter-spacing:.04em}
+form{display:flex;gap:10px}
+.msg{min-height:34px;margin-top:14px;font-size:24px;color:var(--dim)}
+.msg b{color:#fff;font-weight:normal}
+.msg.sim{color:var(--gold)} .msg.miss{color:var(--red)}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+.reveal{margin-top:24px;padding:28px 20px;border:2px solid var(--tc,var(--line));background:rgba(8,14,26,.78);text-align:center;animation:rise .35s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+.rv-icon{display:flex;justify-content:center;margin-bottom:14px;filter:drop-shadow(0 0 12px var(--tc))}
+.rv-tier{letter-spacing:.3em;text-transform:uppercase;font-size:24px}
+.rv-ans{font-size:40px;color:#fff;margin:6px 0}
+.rv-pts{font-family:'Press Start 2P';font-size:26px;margin:10px 0 6px}
+.reveal .btn{margin-top:22px;min-width:220px}
+
+/* summary */
+.scoreline{display:flex;align-items:flex-end;flex-wrap:wrap;gap:6px 18px;margin-top:20px}
+.score{font-family:'Press Start 2P';font-size:clamp(44px,11vw,76px);line-height:1;color:#fff;text-shadow:-4px 0 rgba(236,95,132,.55),4px 0 rgba(111,211,234,.55)}
+.outof{color:var(--dim);font-size:26px}
+.meters{color:var(--cyan);font-size:28px}
+.section-h{display:flex;align-items:center;gap:16px;margin:56px 0 12px;flex-wrap:nowrap}
+.section-h .sub{color:var(--faint);letter-spacing:.2em;font-size:19px;text-transform:uppercase;white-space:nowrap}
+.section-h::after{content:"";flex:1;border-top:2px dashed var(--line);min-width:20px}
+.divelog{width:100%;height:auto;display:block}
+.bearing-row{display:grid;grid-template-columns:52px 110px 1fr;align-items:center;gap:8px;padding:16px 4px;border-bottom:1px solid rgba(255,255,255,.07);color:var(--faint)}
+.bearing-row.on{color:#fff;background:rgba(255,255,255,.03)}
+.actions{margin-top:30px}
+.catch-row{border-bottom:1px solid rgba(255,255,255,.08)}
+.catch-head{display:grid;grid-template-columns:26px 52px 1fr auto 22px;align-items:center;gap:8px;padding:18px 4px;cursor:pointer;width:100%;background:none;border:0;color:inherit;font:inherit;text-align:left}
+.catch-head:hover{background:rgba(255,255,255,.025)}
+.catch-head:focus-visible{outline:2px solid var(--cyan)}
+.catch-row.open .catch-head{outline:2px solid var(--cyan);outline-offset:-2px}
+.c-num{color:var(--faint)}
+.c-q{color:var(--dim);font-size:18px;letter-spacing:.18em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-a{font-size:32px;color:#fff;line-height:1.1;margin:2px 0}
+.c-sub{font-size:20px;color:var(--dim)}
+.c-pts{font-size:26px;text-align:right;min-width:44px}
+.c-plus{color:var(--faint);text-align:center}
+.c-body{min-width:0}
+.bank{list-style:none;margin:0;padding:4px 0 18px 86px}
+.bank li{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:8px;padding:9px 10px}
+.bank li.you{background:rgba(111,211,234,.07)}
+.bank .nm{font-size:26px;color:#fff}
+.bank .you-tag{color:var(--cyan);letter-spacing:.2em;font-size:18px;margin-left:10px}
+.bank .pp{font-size:22px}
+@media (max-width:560px){
+  body{font-size:20px}
+  .logo{font-size:16px}
+  .label{letter-spacing:.18em;font-size:17px}
+  .bank{padding-left:20px}
+  .bearing-row{grid-template-columns:40px 90px 1fr}
+  .c-a{font-size:26px}
+  .section-h .sub{display:none}
+  form .btn{padding:12px 14px;letter-spacing:.15em}
+}
+</style>
+</head>
+<body>
+<div class="bgword" aria-hidden="true"><span>KONRAXD<br>KRILLION</span><span>KONRAXD<br>KRILLION</span></div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="logo">KONRAXD KRILLION</div>
+    <div class="label" id="topRight">THE DAILY DIVE</div>
+  </header>
+
+  <!-- INTRO -->
+  <section id="intro">
+    <h1 class="title">THE DAILY DIVE</h1>
+    <p class="desc">See how well you know KonraXD's Club and its members. Every prompt has a bank of answers, and the rarer the answer you come up with, the deeper you sink and the more points you score.</p>
+    <p class="tag">25 seconds a prompt · rarer answers sink deeper</p>
+    <button class="btn primary wide" id="startBtn">DIVE ▸</button>
+    <div class="legend" id="legend"></div>
+    <div class="archive" id="archiveWrap">
+      <button class="btn wide" id="archiveBtn">ARCHIVE</button>
+      <div class="daybtns hidden" id="archiveList"></div>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="hidden">
+    <div class="hud">
+      <span class="label" id="roundLbl">ROUND 1/7</span>
+      <span class="label">DEPTH <b id="depthLbl">0m</b></span>
+    </div>
+    <div class="air" id="air"><div class="airbar" id="airbar"></div></div>
+    <div class="timer" id="timer">25</div>
+    <div class="prompt" id="prompt"></div>
+    <form id="form" autocomplete="off">
+      <input id="guess" class="txt" placeholder="Type an answer" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="btn" type="submit">ENTER</button>
+    </form>
+    <div class="msg" id="msg"></div>
+    <div class="reveal hidden" id="reveal"></div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section id="summary" class="hidden"></section>
+</div>
+
+<script>
+/* =========================================================
+   EDIT YOUR GAME HERE
+   - ACTIVE_DAY (right below) picks which day plays from the big DIVE button
+   - Days numbered BELOW the active day show up in the Archive on the home screen
+   - Days numbered ABOVE the active day stay hidden until you make them active
+   - Each day's number shows up as "KonraXD Krillion #N" in the copied result
+   - similars: { "what they typed": "Answer it maps to" }
+     Matching already ignores caps, spaces, hyphens, punctuation and a leading #,
+     catches small typos and plurals, and catches answers buried in longer input
+     ("Mr. Ryder" -> Ryder, "gota.io" -> Gota, "FIFA 18" -> FIFA)
+   ========================================================= */
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// >>> CHANGE THIS NUMBER TO SWITCH TODAY'S DIVE (1, 2, 3...)
+const ACTIVE_DAY = 1;
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+const ROUND_SECONDS = 25;   // seconds per prompt
+
+// To add a new day: copy a whole { number: X, questions: [...] } block,
+// paste it at the end of this list, and give it the next number.
+const DAYS = [
+ {
+  number: 1,
+  questions: [
+   {
+    prompt: "Name a KonraXD's Club server member, past or present",
+    answers: {
+      plankton: ["Axel","Konrad","Daniel Perez","Daniel Pesch","Aaquib","Keegan","Jose","Ibraheem","Aidan","John","Diego","Julian","Matty G"],
+      schooler: ["Kyle","CJ"],
+      rare:     ["David","Daemon","Zayd","Matthew Hosp","Ramses","Jonathan"],
+      deep:     ["Chris","James","Jacob"],
+      krillion: ["spaghetti","imchewbacca1"]
+    },
+    similars: {"Daniel":"Daniel Pesch","Pesch":"Daniel Pesch","Perez":"Daniel Perez","Matthew":"Matty G","Matty":"Matty G","Omer":"Aaquib","Ibra":"Ibraheem",
+      "Carmen":"CJ","Carmen John":"CJ","Hosp":"Matthew Hosp","Matt":"Matthew Hosp","Matt Hosp":"Matthew Hosp","Jonny":"Jonathan","Johnny":"Jonathan","Johnathan":"Jonathan",
+      "Christian":"Chris","Chewbacca":"imchewbacca1","imchewbacca":"imchewbacca1"}
+   },
+   {
+    prompt: "Name one of Axel's friends we've played soccer with",
+    answers: {
+      plankton: ["Danut","Tyson","Daniel Alanis","Alex","Adam"],
+      schooler: ["Moises","Julian"],
+      rare:     ["Chris","Alonso"],
+      deep:     ["Jair","stim junkz"],
+      krillion: ["Mateo"]
+    },
+    similars: {"Dan":"Daniel Alanis","Daniel":"Daniel Alanis","Alanis":"Daniel Alanis","Dan Alanis":"Daniel Alanis","Stim":"stim junkz","Stim Junks":"stim junkz","Moses":"Moises"}
+   },
+   {
+    prompt: "Name a high school that a current KonraXD's Club member attended",
+    answers: {
+      plankton: ["Lane Tech College Prep"],
+      schooler: ["Northside College Prep","Westmont High School","Rickover Naval Academy"],
+      rare:     ["Golder College Prep","Chicago Academy High School"],
+      deep:     ["Richwoods High School","Oshkosh West High School"],
+      krillion: ["Glenbard South High School"]
+    },
+    similars: {"Lane":"Lane Tech College Prep","Lane Tech":"Lane Tech College Prep","Lane Technical":"Lane Tech College Prep","Lane Tech High School":"Lane Tech College Prep","Lane Technical College Prep":"Lane Tech College Prep",
+      "Northside":"Northside College Prep","Northside Prep":"Northside College Prep","Northside College Preparatory":"Northside College Prep","Northside High School":"Northside College Prep","NCP":"Northside College Prep",
+      "Westmont":"Westmont High School","Westmont HS":"Westmont High School",
+      "Rickover":"Rickover Naval Academy","Hyman G Rickover Naval Academy":"Rickover Naval Academy","Rickover High School":"Rickover Naval Academy",
+      "Golder":"Golder College Prep","Golder Prep":"Golder College Prep",
+      "Chicago Academy":"Chicago Academy High School",
+      "Richwoods":"Richwoods High School","Richwoods HS":"Richwoods High School",
+      "Oshkosh West":"Oshkosh West High School","Oshkosh West HS":"Oshkosh West High School",
+      "Glenbard South":"Glenbard South High School","Glenbard South HS":"Glenbard South High School"}
+   },
+   {
+    prompt: "Name a sport we played in Thorp gym class",
+    answers: {
+      plankton: ["Soccer","Basketball","Football"],
+      schooler: ["Volleyball"],
+      rare:     ["Mills","Badminton","Ultimate Frisbee","Scooter Hockey"],
+      deep:     ["Tchoukball","Speedball","Olympics"],
+      krillion: ["Handball"]
+    },
+    similars: {"Shookball":"Tchoukball","Choukball":"Tchoukball","Chookball":"Tchoukball","Ultimate":"Ultimate Frisbee","Frisbee":"Ultimate Frisbee","Scooter":"Scooter Hockey","Hockey":"Scooter Hockey","Hoops":"Basketball"}
+   },
+   {
+    prompt: "Name a character listed in Aaquib's Furry Profiles",
+    answers: {
+      plankton: ["Judy Hopps","Lola Bunny"],
+      schooler: ["Nick Wilde","Margaret","Lopunny"],
+      rare:     ["Lucario","Eevee"],
+      deep:     ["Sylveon","Glaceon","Cinderace"],
+      krillion: ["Braixen"]
+    },
+    similars: {"Judy":"Judy Hopps","Hopps":"Judy Hopps","Lola":"Lola Bunny","Nick":"Nick Wilde","Wilde":"Nick Wilde","Evee":"Eevee","Eevie":"Eevee"}
+   },
+   {
+    prompt: "Name a public park in the Chicagoland area we've hung out at (ex: Portage Park)",
+    answers: {
+      plankton: ["Portage Park","Merrimac Park"],
+      schooler: ["Chopin Park","Blackhawk Park"],
+      rare:     ["Ty Warner Park","Pioneer Park"],
+      deep:     ["Wilson Park","Gillson Park"],
+      krillion: ["Centennial Park"]
+    },
+    similars: {"Portage":"Portage Park","Merrimac":"Merrimac Park","Merrimack":"Merrimac Park","Merrimack Park":"Merrimac Park","Chopin":"Chopin Park",
+      "Blackhawk":"Blackhawk Park","Black Hawk":"Blackhawk Park","Ty Warner":"Ty Warner Park","Pioneer":"Pioneer Park","Wilson":"Wilson Park",
+      "Gillson":"Gillson Park","Gilson":"Gillson Park","Gilson Park":"Gillson Park","Centennial":"Centennial Park"}
+   },
+   {
+    prompt: "Name a .io game we played at Thorp",
+    answers: {
+      plankton: ["Mope","MooMoo"],
+      schooler: ["Slither","Bonk"],
+      rare:     ["Splix","Diep"],
+      deep:     ["Foes","Doblons","Gota"],
+      krillion: ["Arras"]
+    },
+    similars: {"Doubloons":"Doblons","Dublons":"Doblons","Doblon":"Doblons"}
+   }
+  ]
+ },
+ {
+  number: 2,
+  questions: [
+   {
+    prompt: "Name a nationality represented in KonraXD's Club",
+    answers: {
+      plankton: ["American","Mexican","Polish"],
+      schooler: ["Indian","German","Puerto Rican"],
+      rare:     ["Egyptian","Ecuadorian"],
+      deep:     ["Guatemalan","Irish"],
+      krillion: ["Syrian"]
+    },
+    similars: {"USA":"American","US":"American","America":"American","United States":"American","Mexico":"Mexican","Poland":"Polish","India":"Indian",
+      "Germany":"German","Puerto Rico":"Puerto Rican","PR":"Puerto Rican","Boricua":"Puerto Rican","Egypt":"Egyptian","Ecuador":"Ecuadorian",
+      "Guatemala":"Guatemalan","Ireland":"Irish","Syria":"Syrian"}
+   },
+   {
+    prompt: "Name a bot in the KonraXD's Club server",
+    answers: {
+      plankton: ["Rythm","Toasty"],
+      schooler: ["MEE6","Dyno","Dank Memer"],
+      rare:     ["IslamBot","BibleBot","Carl-bot","HUGE"],
+      deep:     ["Hydra","Tempo"],
+      krillion: ["esmBot"]
+    },
+    similars: {"Rhythm":"Rythm","Mee":"MEE6","Dank":"Dank Memer","Islam":"IslamBot","Bible":"BibleBot","Carl":"Carl-bot","Esm":"esmBot","Toast":"Toasty"}
+   },
+   {
+    prompt: "Name a college or university a current KonraXD's Club member attends or has attended",
+    answers: {
+      plankton: ["UIC","UIUC","Wright College"],
+      schooler: ["Northwestern"],
+      rare:     ["Bradley","UWO","Columbia College Chicago"],
+      deep:     ["College of DuPage"],
+      krillion: ["Kendall College"]
+    },
+    similars: {"University of Illinois Chicago":"UIC","University of Illinois at Chicago":"UIC",
+      "University of Illinois Urbana Champaign":"UIUC","University of Illinois at Urbana Champaign":"UIUC","University of Illinois":"UIUC","U of I":"UIUC","Illinois":"UIUC",
+      "Wright":"Wright College","Wilbur Wright":"Wright College","Wilbur Wright College":"Wright College",
+      "Northwestern University":"Northwestern","NU":"Northwestern",
+      "Bradley University":"Bradley",
+      "University of Wisconsin Oshkosh":"UWO","UW Oshkosh":"UWO","Wisconsin Oshkosh":"UWO","Oshkosh":"UWO",
+      "Columbia":"Columbia College Chicago","Columbia College":"Columbia College Chicago",
+      "COD":"College of DuPage","DuPage":"College of DuPage",
+      "Kendall":"Kendall College"}
+   },
+    {
+      prompt: "Name anyone on Keegan's **** List",
+      answers: {
+        plankton: ["James Charles", "Pokimane"],
+        schooler: ["Loona", "Velma", "Lola", "Daphne"],
+        rare: ["Amy", "Blaze", "Lara Croft"],
+        deep: ["Tom and Jerry Cat Lady Thing", "Sam", "COC Villager Lady", "Lady Dimitrescu", "Snapchat They/Them", "Ankha", "IQ"],
+        krillion: ["Toodles Galore", "Whisper the Wolf"]
+      },
+      similars: {
+        "James": "James Charles", "Poki": "Pokimane", "Luna": "Loona", "Lola Bunny": "Lola", "Amy Rose": "Amy",
+        "Blaze the Cat": "Blaze", "Lara": "Lara Croft", "Cat Lady": "Tom and Jerry Cat Lady Thing", "Mammy Two Shoes": "Tom and Jerry Cat Lady Thing",
+        "Villager": "COC Villager Lady", "Villager Lady": "COC Villager Lady", "COC Villager": "COC Villager Lady", "Clash of Clans Villager": "COC Villager Lady",
+        "Clash of Clans Villager Lady": "COC Villager Lady", "Lady D": "Lady Dimitrescu", "Dimitrescu": "Lady Dimitrescu",
+        "They Them": "Snapchat They/Them", "They/Them": "Snapchat They/Them", "Anka": "Ankha",
+        "Toodles": "Toodles Galore", "Whisper": "Whisper the Wolf"
+      }
+    },
+   {
+    prompt: "Name a channel in the KonraXD's Club server",
+    answers: {
+      plankton: ["rules","announcements","hall-of-fame","pitbull-convention","quotes"],
+      schooler: ["nuclear-testing-site","serious","hangout","voting","hard-pic-of-the-day","yum-yum-daily","art","vlogs","college-talk","dream-logs","pokemon","bot-commands"],
+      rare:     ["gartic-jackbox","matty-g-raps","matty-g-rape-chat","keegans-****-list","matty-g-wife-list","confessions","aaquibs-furry-profiles","memes","gifs","fortnite","gaming","homework","minecraft","spongebob","roleplaying","io-games"],
+      deep:     ["westmont-shower-agreement","drip-day","movie-ideas","autistic-quiz-scores","demand-list","jeopardy","hs-results"],
+      krillion: ["zayd-is-hot-channel-dont-delete-or-gay"]
+    },
+    similars: {"hof":"hall-of-fame","pitbull":"pitbull-convention","nuclear":"nuclear-testing-site","nuke":"nuclear-testing-site","testing site":"nuclear-testing-site",
+      "hard pic":"hard-pic-of-the-day","yum yum":"yum-yum-daily","dreams":"dream-logs","bots":"bot-commands","commands":"bot-commands",
+      "jackbox":"gartic-jackbox","gartic":"gartic-jackbox","gartic phone":"gartic-jackbox","matty raps":"matty-g-raps","wife list":"matty-g-wife-list",
+      "furry profiles":"aaquibs-furry-profiles","aaquib furry profiles":"aaquibs-furry-profiles","keegan fuck list":"keegans-****-list","keegans fuck list":"keegans-****-list","fuck list":"keegans-****-list",
+      "roleplay":"roleplaying","io":"io-games","shower agreement":"westmont-shower-agreement","drip":"drip-day","quiz scores":"autistic-quiz-scores",
+      "demands":"demand-list","results":"hs-results","zayd is hot":"zayd-is-hot-channel-dont-delete-or-gay","zayd":"zayd-is-hot-channel-dont-delete-or-gay"}
+   },
+   {
+    prompt: "Name a teacher we had at Thorp in 6th-8th grade (any subject)",
+    answers: {
+      plankton: ["Coughlin","McNally","Alper","Mackie"],
+      schooler: ["Littleton","Dumalski","Romei","McGoldrick","Ryder","Ruszel","Vikhter","Wilson"],
+      rare:     ["Stowell","Hanauer","Adenuga"],
+      deep:     ["Galligan","Porterfield","Powers"],
+      krillion: ["Sotelo"]
+    },
+    similars: {"Mr A":"Adenuga","Ms A":"Adenuga","Mrs A":"Adenuga"}
+   },
+   {
+    prompt: "Name a multiplayer video game we've played at Konrad's house",
+    answers: {
+      plankton: ["Super Smash Bros","Mario Party"],
+      schooler: ["FIFA","Mario Strikers","Mario Kart","Jackbox","Gartic"],
+      rare:     ["Pico Park","Mario Party Superstars"],
+      deep:     ["Mario Party 10","Super Mario Party"],
+      krillion: ["Nintendo Land"]
+    },
+    similars: {"Smash":"Super Smash Bros","Smash Bros":"Super Smash Bros","SSB":"Super Smash Bros","SSBU":"Super Smash Bros","Smash Ultimate":"Super Smash Bros","Melee":"Super Smash Bros","Brawl":"Super Smash Bros",
+      "Bowser Party":"Mario Party 10","MP10":"Mario Party 10","Strikers":"Mario Strikers","MK":"Mario Kart","MK8":"Mario Kart",
+      "Pico":"Pico Park","Jackbox Party Pack":"Jackbox","EA FC":"FIFA"}
+   }
+  ]
+ }
+];
+let QUESTIONS = DAYS[0].questions;
+
+/* ========================================================= */
+
+const TIERS = {
+  plankton: {name:"Plankton",          pts:10,  hex:"#b9c6d6", emoji:"🫧", copy:"plankton"},
+  schooler: {name:"Schooler",          pts:30,  hex:"#6fd3ea", emoji:"🐟", copy:"schooler"},
+  rare:     {name:"Rare",              pts:60,  hex:"#e5484d", emoji:"🦑", copy:"rare"},
+  deep:     {name:"Deep cut",          pts:85,  hex:"#8f7cf0", emoji:"🏮", copy:"deep cut"},
+  krillion: {name:"One in a krillion", pts:100, hex:"#f2c94c", emoji:"🌟", copy:"one in a krillion"}
+};
+const TIER_ORDER = ["krillion","deep","rare","schooler","plankton"];
+const BEARING = [
+  {tier:"plankton", range:"0-150",   lo:0,   hi:150,  text:"Plankton. Still bobbing near the surface."},
+  {tier:"schooler", range:"151-250", lo:151, hi:250,  text:"Schooler. Safe in the middle of the crowd."},
+  {tier:"rare",     range:"251-350", lo:251, hi:350,  text:"Rare. Past the thermocline. Respect."},
+  {tier:"deep",     range:"351-449", lo:351, hi:449,  text:"Deep cut. The sunlight quit a while ago."},
+  {tier:"krillion", range:"450+",    lo:450, hi:9999, text:"One in a krillion. Trench dweller. Unreal."}
+];
+
+/* ---------- pixel sprites ---------- */
+const PAL = {o:"#9fb3c8",h:"#ffffff",b:"#6fd3ea",d:"#3a9cbc",e:"#0c1424",r:"#e5484d",k:"#ff9a9a",p:"#7b7fe0",l:"#d6f1ff",w:"#e9eef5",s:"#e5484d",g:"#f2c94c",x:"#0b0f17",f:"#ec5f84",n:"#070b14",q:"#ff7a59",z:"#ffc2a8",y:"#f2c94c",v:"#ff9f80"};
+const SPRITES = {
+  plankton:["...ooo.....","..o...o....",".o.h...o...",".o.....o...",".o.....o...","..o...o....","...ooo.ooo.","......o.h.o","......o...o",".......ooo."],
+  schooler:["....bbbb..d.","..bbbbbbb.dd",".bbebbbbbbdd",".bbbbbbbbbdd","..bbbbbbb.dd","....bbbb..d."],
+  rare:["r...r...r","r..r.r..r",".r.r.r.r.",".rr.r.rr.","..rrrrr..","...rkr...","...rrr...","....r....","...rrr...","....r...."],
+  deep:["..l...........","...p..........","....p.pppp....","...pppppppp.pp","..ppeppppppppp",".wpwppppppppp.",".pppppppppppp.","..wpwppppppppp","...pppppp...pp","....pppp......"],
+  krillion:["yyyy............","....yy..qqq.....",".....yqqzzqq....","...eqqqqqzzqq...","..qqqqqqqqqzzq..","...qqqqqqqqqqq..","....v.v.v.v.qqq.","...........qqq..","..........qqqq..",".........q.q.q.."],
+  boat:["....xff......","....xfff.....","....x........","....x........","..xxxxxx.....","..x.x.x.x....","xxxxxxxxxxxxx",".xxxxxxxxxxx.","..xxxxxxxxx.."],
+  fish:[".nnn..n","nnnnnnn",".nnn..n"]
+};
+function rects(map, sc, ox=0, oy=0){
+  let out = "";
+  map.forEach((row,y)=>{ [...row].forEach((c,x)=>{ if(c!==".") out += `<rect x="${ox+x*sc}" y="${oy+y*sc}" width="${sc}" height="${sc}" fill="${PAL[c]}"/>`; }); });
+  return out;
+}
+function sprite(key, sc=3){
+  const m = SPRITES[key], w = m[0].length*sc, h = m.length*sc;
+  return `<svg class="spr" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges" aria-hidden="true">${rects(m,sc)}</svg>`;
+}
+function emptyIcon(size=30){
+  return `<svg class="spr" width="${size}" height="${size}" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="none" stroke="#56627a" stroke-width="2.5" stroke-dasharray="4 4"/></svg>`;
+}
+
+/* ---------- matching ---------- */
+function norm(s){
+  return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()
+    .replace(/&/g,"and").trim().replace(/^[#@]+/,"").replace(/^the\s+/,"").replace(/[^a-z0-9+#]/g,"");
+}
+function lev(a,b){
+  const m=a.length,n=b.length,d=Array.from({length:m+1},(_,i)=>[i]);
+  for(let j=1;j<=n;j++) d[0][j]=j;
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return d[m][n];
+}
+function prep(){
+  DAYS.flatMap(d=>d.questions).forEach(q=>{
+    q.entries = [];
+    TIER_ORDER.forEach(t=>(q.answers[t]||[]).forEach(name=>q.entries.push({name,tier:t,pts:TIERS[t].pts,n:norm(name)})));
+    const byN = new Map(q.entries.map(e=>[e.n,e]));
+    q.aliases = Object.entries(q.similars||{}).map(([a,t])=>({n:norm(a),entry:byN.get(norm(t))})).filter(a=>a.entry);
+  });
+}
+function judge(q, raw){
+  const n = norm(raw);
+  if(!n) return {type:"empty"};
+  const exact = q.entries.find(e=>e.n===n);
+  if(exact) return {type:"hit", entry:exact};
+  const al = q.aliases.find(a=>a.n===n);
+  if(al) return {type:"similar", entry:al.entry};
+  for(const e of q.entries){
+    if(e.n.length>=3 && (e.n+"s"===n || e.n+"es"===n || n+"s"===e.n)) return {type:"similar", entry:e};
+  }
+  let inside=null;
+  for(const e of q.entries){
+    if(e.n.length>=4 && n.includes(e.n) && n.length<=e.n.length+10 && (!inside || e.n.length>inside.n.length)) inside=e;
+  }
+  if(inside) return {type:"similar", entry:inside};
+  let best=null, bd=99;
+  for(const c of [...q.entries.map(e=>({n:e.n,entry:e})), ...q.aliases]){
+    if(c.n.length<5) continue;
+    const tol = c.n.length>=8 ? 2 : 1;
+    if(Math.abs(c.n.length-n.length)>tol) continue;
+    const d = lev(n,c.n);
+    if(d<=tol && d<bd){ bd=d; best=c.entry; }
+  }
+  return best ? {type:"similar", entry:best} : {type:"miss"};
+}
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtM = pts => (pts>0?"-":"") + (pts*10).toLocaleString() + "m";
+const total = () => state.results.reduce((a,r)=>a+r.pts,0);
+function show(id){ ["intro","game","summary"].forEach(s=>$(s).classList.toggle("hidden", s!==id)); window.scrollTo(0,0); }
+function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){ return null; } }
+
+/* ---------- sounds (synthesized, no files) ---------- */
+let AC = null;
+function ac(){
+  if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+  if(AC.state==="suspended") AC.resume();
+  return AC;
+}
+function tone(freq, start, dur, type="square", vol=.07, endFreq){
+  const a = ac(); if(!a) return;
+  const t = a.currentTime + start, o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  if(endFreq) o.frequency.exponentialRampToValueAtTime(endFreq, t+dur);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur+0.03);
+}
+const SFX = {
+  dive(){ // downward whoosh + rising bubbles
+    tone(620, 0, .28, "sine", .12, 170);
+    [0.1,0.17,0.24].forEach((st,i)=>tone(650+i*200, st, .06, "sine", .05, 1050+i*180));
+  },
+  surface(){ // celebratory fanfare when the results come up
+    [[392,0],[523,.1],[659,.2],[784,.3],[659,.45],[784,.55]].forEach(([f,st])=>tone(f, st, .11, "square", .06));
+    tone(1047, .67, .8, "square", .06);
+    [523,659,784].forEach(f=>tone(f, .67, .9, "triangle", .05));
+  },
+  wrong(){ tone(170, 0, .11, "square", .06, 130); tone(125, .1, .2, "square", .06, 80); },
+  right(tier){ // rarer tier = longer, higher arpeggio
+    const seq = {plankton:[523,659], schooler:[523,659,784], rare:[523,659,784,1047],
+                 deep:[392,523,659,784,1047], krillion:[523,659,784,1047,1319,1568]}[tier];
+    seq.forEach((f,i)=>tone(f, i*.07, .15, "square", .055));
+    if(tier==="krillion"){ const t=seq.length*.07; tone(1568,t,.5,"triangle",.08); tone(2093,t+.06,.45,"triangle",.05); }
+  }
+};
+
+/* ---------- game state ---------- */
+const state = {i:0, results:[], deadline:0, raf:0, done:false, revealAt:0, lastWrong:"", name:"Diver", dive:1};
+
+function buildLegend(){
+  $("legend").innerHTML = `<div class="label" style="margin-bottom:8px">The tiers</div>` +
+    TIER_ORDER.slice().reverse().map(t=>`<div class="legend-row"><div class="ico">${sprite(t,3)}</div><div style="color:${TIERS[t].hex}">${TIERS[t].name}</div><div style="color:${TIERS[t].hex}">${TIERS[t].pts} pt</div></div>`).join("");
+}
+
+function startGame(dayNum){
+  SFX.dive();
+  const day = DAYS.find(d=>d.number===dayNum) || DAYS[0];
+  QUESTIONS = day.questions; state.dive = day.number;
+  state.results = [];
+  $("topRight").textContent = `DIVE #${state.dive}`;
+  show("game");
+  startRound(0);
+}
+
+function startRound(i){
+  state.i = i; state.done = false; state.lastWrong = "";
+  const q = QUESTIONS[i];
+  $("roundLbl").textContent = `ROUND ${i+1}/${QUESTIONS.length}`;
+  $("depthLbl").textContent = fmtM(total());
+  $("prompt").textContent = q.prompt;
+  $("msg").textContent = ""; $("msg").className = "msg";
+  $("reveal").classList.add("hidden");
+  $("form").classList.remove("hidden");
+  const g = $("guess"); g.value = ""; g.disabled = false; g.focus();
+  $("timer").classList.remove("low"); $("air").classList.remove("low");
+  state.deadline = performance.now() + ROUND_SECONDS*1000;
+  cancelAnimationFrame(state.raf);
+  tick();
+}
+
+function tick(){
+  if(state.done) return;
+  const left = Math.max(0,(state.deadline - performance.now())/1000);
+  $("timer").textContent = Math.ceil(left);
+  $("airbar").style.width = (left/ROUND_SECONDS*100) + "%";
+  const low = left <= 5;
+  $("timer").classList.toggle("low", low); $("air").classList.toggle("low", low);
+  if(left <= 0){ finish(null); return; }
+  state.raf = requestAnimationFrame(tick);
+}
+
+function setMsg(html, cls){ const m=$("msg"); m.innerHTML = html; m.className = "msg " + (cls||""); }
+
+$("form").addEventListener("submit", e=>{
+  e.preventDefault();
+  if(state.done) return;
+  const g = $("guess"), raw = g.value;
+  const r = judge(QUESTIONS[state.i], raw);
+  if(r.type==="empty") return;
+  if(r.type==="hit") return finish(r.entry);
+  if(r.type==="similar"){
+    g.value = r.entry.name;
+    setMsg(`Did you mean <b>${esc(r.entry.name)}</b>? Press enter to submit.`, "sim");
+    g.focus(); g.setSelectionRange(g.value.length, g.value.length);
+    return;
+  }
+  state.lastWrong = raw.trim();
+  SFX.wrong();
+  setMsg(`"${esc(raw.trim())}" isn't in the bank. Keep fishing.`, "miss");
+  g.value = "";
+  g.classList.remove("shake"); void g.offsetWidth; g.classList.add("shake");
+});
+
+function finish(entry){
+  state.done = true;
+  cancelAnimationFrame(state.raf);
+  const q = QUESTIONS[state.i];
+  state.results[state.i] = entry ? {entry, pts:entry.pts, guess:entry.name} : {entry:null, pts:0, guess:state.lastWrong};
+  $("guess").disabled = true;
+  $("form").classList.add("hidden");
+  $("depthLbl").textContent = fmtM(total());
+  const last = state.i === QUESTIONS.length-1;
+  const rv = $("reveal");
+  if(entry){
+    const T = TIERS[entry.tier];
+    SFX.right(entry.tier);
+    rv.style.setProperty("--tc", T.hex);
+    setMsg("", "");
+    rv.innerHTML = `<div class="rv-icon">${sprite(entry.tier,6)}</div>
+      <div class="rv-tier" style="color:${T.hex}">${T.name}</div>
+      <div class="rv-ans">${esc(entry.name)}</div>
+      <div class="rv-pts" style="color:${T.hex}">+${entry.pts}</div>
+      <button class="btn primary" id="nextBtn">${last?"SURFACE":"DIVE"} ▸</button>`;
+  } else {
+    rv.style.setProperty("--tc", "#56627a");
+    setMsg("", "");
+    rv.innerHTML = `<div class="rv-icon">${emptyIcon(60)}</div>
+      <div class="rv-tier" style="color:var(--red)">Out of air</div>
+      <div class="rv-ans">${state.lastWrong?`"${esc(state.lastWrong)}"`:"No answer"}</div>
+      <div class="rv-pts" style="color:var(--faint)">+0</div>
+      <button class="btn primary" id="nextBtn">${last?"SURFACE":"DIVE"} ▸</button>`;
+  }
+  rv.classList.remove("hidden");
+  state.revealAt = performance.now();
+  const nb = $("nextBtn");
+  nb.addEventListener("click", ()=>{
+    if(performance.now() - state.revealAt < 350) return;
+    if(last) SFX.surface(); else SFX.dive();
+    if(last) showSummary(); else startRound(state.i+1);
+  });
+  nb.focus();
+}
+
+/* ---------- summary ---------- */
+function diveLogSVG(){
+  const W=720,H=440,top=40,ys=3.2, y=p=>top+p*ys, colX=i=>120+i*93.3, surf=y(10);
+  let wave=`M0 ${surf}`;
+  for(let x=0;x<=W;x+=10) wave += `L${x} ${(surf+5*Math.sin(x/70)).toFixed(1)}`;
+  wave += `L${W} ${H}L0 ${H}Z`;
+  let grid="";
+  [0,25,50,75,100].forEach(dp=>{
+    grid += `<line x1="76" y1="${y(dp)}" x2="${W-10}" y2="${y(dp)}" stroke="#56627a" stroke-opacity=".5" stroke-dasharray="6 6"/>`;
+    grid += `<text x="66" y="${y(dp)+6}" text-anchor="end" fill="#8a96a8" font-family="VT323,monospace" font-size="20">${dp?"-"+dp:"0m"}</text>`;
+  });
+  let cols="";
+  state.results.forEach((r,i)=>{
+    const cx = colX(i);
+    if(r.entry){
+      const T=TIERS[r.entry.tier], m=SPRITES[r.entry.tier], sc=3, w=m[0].length*sc, h=m.length*sc, cy=y(r.pts);
+      cols += `<line x1="${cx}" y1="${y(0)+6}" x2="${cx}" y2="${cy-h/2}" stroke="${T.hex}" stroke-opacity=".55" stroke-width="2"/>`;
+      cols += `<circle cx="${cx}" cy="${cy}" r="26" fill="url(#glow-${r.entry.tier})"/>`;
+      cols += `<g transform="translate(${(cx-w/2).toFixed(1)},${(cy-h/2).toFixed(1)})" shape-rendering="crispEdges">${rects(m,sc)}</g>`;
+    } else {
+      cols += `<circle cx="${cx}" cy="${y(0)+4}" r="13" fill="none" stroke="#56627a" stroke-width="2.5" stroke-dasharray="4 4"/>`;
+    }
+    cols += `<text x="${cx}" y="${H-8}" text-anchor="middle" fill="#8a96a8" font-family="VT323,monospace" font-size="22">${i+1}</text>`;
+  });
+  const glows = Object.keys(TIERS).map(t=>`<radialGradient id="glow-${t}"><stop offset="0" stop-color="${TIERS[t].hex}" stop-opacity=".45"/><stop offset="1" stop-color="${TIERS[t].hex}" stop-opacity="0"/></radialGradient>`).join("");
+  const fish = [[180,330],[420,350],[600,300]].map(([fx,fy])=>`<g opacity=".8" shape-rendering="crispEdges">${rects(SPRITES.fish,5,fx,fy)}</g>`).join("");
+  return `<svg class="divelog" viewBox="0 0 ${W} ${H}" role="img" aria-label="Dive log: depth reached per round">
+    <defs><linearGradient id="og" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#17233a"/><stop offset="1" stop-color="#0a1120"/></linearGradient>${glows}</defs>
+    <path d="${wave}" fill="url(#og)"/>
+    <g shape-rendering="crispEdges">${rects(SPRITES.boat,4,-18,surf-36)}</g>
+    ${fish}${grid}${cols}
+  </svg>`;
+}
+
+function copyText(){
+  const em = state.results.map(r=>r.entry?TIERS[r.entry.tier].emoji:"⬛").join("");
+  return `KonraXD Krillion #${state.dive} 🦐\n${total()}\n\n${em}`;
+}
+async function doCopy(btn){
+  const t = copyText();
+  try{ await navigator.clipboard.writeText(t); }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");}catch(_){} ta.remove(); }
+  btn.textContent = "COPIED!"; setTimeout(()=>btn.textContent="COPY RESULT", 1500);
+}
+
+function catchRows(){
+  return state.results.map((r,i)=>{
+    const q = QUESTIONS[i];
+    const icon = r.entry ? sprite(r.entry.tier,3) : emptyIcon(30);
+    const T = r.entry ? TIERS[r.entry.tier] : null;
+    const ans = r.entry ? esc(r.entry.name) : (r.guess?`"${esc(r.guess)}"`:"No answer");
+    const sub = r.entry ? `<div class="c-sub" style="color:${T.hex}">${T.name}</div>` : `<div class="c-sub">Out of air</div>`;
+    const bank = q.entries.map(e=>{
+      const you = r.entry && r.entry.n===e.n;
+      return `<li class="${you?"you":""}"><div class="ico">${sprite(e.tier,2)}</div><div class="nm">${esc(e.name)}${you?'<span class="you-tag">YOU</span>':""}</div><div class="pp" style="color:${TIERS[e.tier].hex}">+${e.pts}</div></li>`;
+    }).join("");
+    return `<div class="catch-row">
+      <button class="catch-head" aria-expanded="false">
+        <span class="c-num">${i+1}</span>
+        <span class="ico">${icon}</span>
+        <span class="c-body"><div class="c-q">${esc(q.prompt)}</div><div class="c-a">${ans}</div>${sub}</span>
+        <span class="c-pts" style="color:${T?T.hex:"#56627a"}">${r.pts}</span>
+        <span class="c-plus">+</span>
+      </button>
+      <ul class="bank hidden">${bank}</ul>
+    </div>`;
+  }).join("");
+}
+
+function showSummary(){
+  const score = total();
+  const bear = BEARING.find(b=>score>=b.lo && score<=b.hi);
+  $("topRight").textContent = `DIVE #${state.dive} COMPLETE`;
+  $("summary").innerHTML = `
+    <div class="scoreline"><span class="score" id="scoreNum">0</span><span class="outof">/ ${QUESTIONS.length*100}</span><span class="meters">${fmtM(score)}</span></div>
+
+    <div class="section-h"><span class="label">Dive log</span><span class="sub">deeper = rarer</span></div>
+    ${diveLogSVG()}
+
+    <div class="section-h"><span class="label">The bearing</span></div>
+    ${BEARING.map(b=>`<div class="bearing-row ${b===bear?"on":""}"><div class="ico">${sprite(b.tier,3)}</div><div style="color:${TIERS[b.tier].hex}">${b.range}</div><div>${b.text}</div></div>`).join("")}
+
+    <div class="actions"><button class="btn primary wide" id="copyBtn">COPY RESULT</button></div>
+
+    <div class="section-h"><span class="label">The catch</span><span class="sub">tap a round for every answer</span></div>
+    ${catchRows()}
+
+    <div class="actions"><button class="btn wide" id="againBtn">DIVE AGAIN ▸</button></div>`;
+  show("summary");
+  $("copyBtn").addEventListener("click", e=>doCopy(e.currentTarget));
+  $("againBtn").addEventListener("click", ()=>{ SFX.dive(); show("intro"); $("topRight").textContent="THE DAILY DIVE"; });
+  document.querySelectorAll(".catch-head").forEach(h=>h.addEventListener("click", ()=>{
+    const row = h.parentElement, open = !row.classList.contains("open");
+    row.classList.toggle("open", open);
+    row.querySelector(".bank").classList.toggle("hidden", !open);
+    row.querySelector(".c-plus").textContent = open ? "−" : "+";
+    h.setAttribute("aria-expanded", open);
+  }));
+  const el=$("scoreNum"), t0=performance.now();
+  (function up(t){ const k=Math.min(1,(t-t0)/900); el.textContent=Math.round(score*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(up); })(t0);
+}
+
+/* ---------- boot ---------- */
+prep();
+buildLegend();
+const active = DAYS.find(d=>d.number===ACTIVE_DAY) || DAYS[0];
+$("startBtn").textContent = `DIVE #${active.number} ▸`;
+$("startBtn").addEventListener("click", ()=>startGame(active.number));
+const past = DAYS.filter(d=>d.number<active.number).sort((a,b)=>b.number-a.number);
+if(!past.length) $("archiveWrap").classList.add("hidden");
+$("archiveList").innerHTML = past.map(d=>`<button class="btn wide" data-day="${d.number}">DAY ${d.number} ▸</button>`).join("");
+$("archiveList").querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>startGame(+b.dataset.day)));
+$("archiveBtn").addEventListener("click", ()=>{
+  const open = !$("archiveList").classList.toggle("hidden");
+  $("archiveBtn").textContent = open ? "HIDE ARCHIVE" : "ARCHIVE";
+});
+</script>
+</body>
+</html>
