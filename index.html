@@ -206,9 +206,9 @@ const DAYS = [
     prompt: "Name one of Axel's friends we've played soccer with",
     answers: {
       plankton: ["Danut","Tyson","Daniel Alanis","Alex","Adam"],
-      schooler: ["Moises","Julian"],
-      rare:     ["Chris","Alonso"],
-      deep:     ["Jair","stim junkz"],
+      schooler: ["Moises"],
+      rare:     ["Julian"],
+      deep:     ["Alonso","Chris","Jair","stim junkz"],
       krillion: ["Mateo"]
     },
     similars: {"Dan":"Daniel Alanis","Daniel":"Daniel Alanis","Alanis":"Daniel Alanis","Dan Alanis":"Daniel Alanis","Stim":"stim junkz","Stim Junks":"stim junkz","Moses":"Moises"}
@@ -238,8 +238,8 @@ const DAYS = [
       plankton: ["Soccer","Basketball","Football"],
       schooler: ["Volleyball"],
       rare:     ["Mills","Badminton","Ultimate Frisbee","Scooter Hockey"],
-      deep:     ["Tchoukball","Speedball","Olympics"],
-      krillion: ["Handball"]
+      deep:     ["Tchoukball","Speedball"],
+      krillion: ["Handball","Olympics"]
     },
     similars: {"Shookball":"Tchoukball","Choukball":"Tchoukball","Chookball":"Tchoukball","Ultimate":"Ultimate Frisbee","Frisbee":"Ultimate Frisbee","Scooter":"Scooter Hockey","Hockey":"Scooter Hockey","Hoops":"Basketball"}
    },
@@ -259,24 +259,24 @@ const DAYS = [
     answers: {
       plankton: ["Portage Park","Merrimac Park"],
       schooler: ["Chopin Park","Blackhawk Park"],
-      rare:     ["Ty Warner Park","Pioneer Park","Hiawatha Park"],
+      rare:     ["Ty Warner Park","Pioneer Park","Hiawatha Park","Shabbona Park"],
       deep:     ["Wilson Park","Gillson Park"],
       krillion: ["Centennial Park"]
     },
     similars: {"Portage":"Portage Park","Merrimac":"Merrimac Park","Hiawatha":"Hiawatha Park","Merrimack":"Merrimac Park","Merrimack Park":"Merrimac Park","Chopin":"Chopin Park",
-      "Blackhawk":"Blackhawk Park","Black Hawk":"Blackhawk Park","Ty Warner":"Ty Warner Park","Pioneer":"Pioneer Park","Wilson":"Wilson Park",
+      "Blackhawk":"Blackhawk Park","Black Hawk":"Blackhawk Park","Ty Warner":"Ty Warner Park","Pioneer":"Pioneer Park","Wilson":"Wilson Park","Shabbona":"Shabbona Park","Shabona":"Shabbona Park",
       "Gillson":"Gillson Park","Gilson":"Gillson Park","Gilson Park":"Gillson Park","Centennial":"Centennial Park"}
    },
    {
     prompt: "Name a .io game we played at Thorp",
     answers: {
-      plankton: ["Mope","MooMoo"],
-      schooler: ["Slither","Bonk"],
-      rare:     ["Splix","Diep","Wings"],
-      deep:     ["Foes","Doblons","Gota"],
+      plankton: ["MooMoo","Agar"],
+      schooler: ["Mope","Bonk"],
+      rare:     ["Slither","Diep"],
+      deep:     ["Foes","Doblons","Splix","Gota","Gats","Wings","ZombsRoyale"],
       krillion: ["Arras"]
     },
-    similars: {"Doubloons":"Doblons","Dublons":"Doblons","Doblon":"Doblons"}
+    similars: {"Doubloons":"Doblons","Dublons":"Doblons","Doblon":"Doblons","Zombs":"ZombsRoyale"}
    }
   ]
  },
@@ -580,8 +580,18 @@ function tick(){
   $("airbar").style.width = (left/ROUND_SECONDS*100) + "%";
   const low = left <= 5;
   $("timer").classList.toggle("low", low); $("air").classList.toggle("low", low);
-  if(left <= 0){ finish(null); return; }
+  if(left <= 0){ buzzer(); return; }
   state.raf = requestAnimationFrame(tick);
+}
+
+// Time ran out: whatever is still typed in the box counts as a final answer.
+// A "did you mean" match is accepted too, since there's no time left to confirm it.
+function buzzer(){
+  const raw = $("guess").value;
+  const r = judge(QUESTIONS[state.i], raw);
+  if(r.type==="hit" || r.type==="similar") return finish(r.entry);
+  if(r.type==="miss") state.lastWrong = raw.trim();
+  finish(null);
 }
 
 function setMsg(html, cls){ const m=$("msg"); m.innerHTML = html; m.className = "msg " + (cls||""); }
@@ -725,10 +735,11 @@ function showSummary(){
     <div class="section-h"><span class="label">Dive log</span><span class="sub">deeper = rarer</span></div>
     ${diveLogSVG()}
 
+    <div class="actions"><button class="btn primary wide" id="copyBtn">COPY RESULT</button></div>
+
     <div class="section-h"><span class="label">The bearing</span></div>
     ${BEARING.map(b=>`<div class="bearing-row ${b===bear?"on":""}"><div class="ico">${sprite(b.tier,3)}</div><div style="color:${TIERS[b.tier].hex}">${b.range}</div><div>${b.text}</div></div>`).join("")}
 
-    <div class="actions"><button class="btn primary wide" id="copyBtn">COPY RESULT</button></div>
 
     <div class="section-h"><span class="label">The catch</span><span class="sub">tap a round for every answer</span></div>
     ${catchRows()}
